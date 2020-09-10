@@ -16,6 +16,16 @@
 
 ## Run
 
+Put targets' image into directory 'raw'
+
+run
+
+```
+python3 create_db.py
+```
+
+to extract face only of those targets (in 'database' directory, better create this directory first). These faces are resized and aligned to 112x112 (I still got a bug on align step, try to make it better later).
+
 Get image from webcam as default
 
 ```
