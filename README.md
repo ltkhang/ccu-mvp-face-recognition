@@ -36,7 +36,7 @@ python3 app.py
 
 We combined yolov4-tiny (3 yolo layers) at the size of 192x192 for face detection task, sort (simple online and realtime tracking) for face tracking task, and mobilefacenet (arcface) for face's features extraction task.
 
-To observe the best threshold on Asian faces, we tested with 2 differnet Asian face dataset at repo: https://github.com/ltkhang/CASIA_FACE_V5_verification
+To observe the best threshold on Asian faces, we tested with 2 different Asian face dataset at repo: https://github.com/ltkhang/CASIA_FACE_V5_verification
 
 ## Demo
 
