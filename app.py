@@ -39,12 +39,13 @@ def draw_boxes(detections, image, idx_dict):
 
 if __name__ == '__main__':
     db_dir = './database'
-    MAX_FRAME = 30
+    MAX_FRAME = 15
     THRESHOLD = 1.0
     # load yolo
     network, class_names, colors = darknet.load_network("yolo/fs_192.cfg", "yolo/obj.data",
                                                 "yolo/yolo.weights")
     vid_path = 0
+    #vid_path = "videoplayback.mp4"
     cap = cv2.VideoCapture(vid_path)
     vid_width = int(cap.get(3))
     vid_height = int(cap.get(4))
@@ -131,7 +132,7 @@ if __name__ == '__main__':
             dets = get_detections(detections, frame, (width, height))
             track_bbs_ids = mot_tracker.update(dets)
             # cal landmark
-            tempimg = np.zeros((48, 48, 3, len(track_bbs_ids)))
+            temp = [] # np.zeros((48, 48, 3, len(track_bbs_ids)))
             idx_list = []
             coords = []
             for k in range(len(track_bbs_ids)):
@@ -139,8 +140,7 @@ if __name__ == '__main__':
                 roi = frame_rgb[top:bottom, left:right]
                 if roi.shape[0] == 0 or roi.shape[1] == 0:
                     continue
-                roi = cv2.resize(roi, (48, 48), cv2.INTER_AREA)
-                tempimg[:, :, :, k] = roi
+                
                 if idx not in idx_dict:
                     idx_dict[idx] = dict()
                     idx_dict[idx]['roll'] = 1000
@@ -151,10 +151,16 @@ if __name__ == '__main__':
                 if idx_dict[idx]['is_recognized'] == False:
                     idx_list.append(idx)
                     coords.append([left, top, right, bottom])
+                    roi = cv2.resize(roi, (48, 48), cv2.INTER_AREA)
+                    temp.append(roi)
+            tempimg = np.zeros((48, 48, 3, len(temp)))
+            for i, te in enumerate(temp):
+                tempimg[:, :, :, i] = temp[i]
             tempimg = np.transpose((tempimg - 127.5) * 0.0078125, (3, 1, 0, 2))
             output = onet(tempimg)
             points = []
-            for o in output:
+            for i, o in enumerate(output):
+                left, top, right, bottom = coords[i]
                 w_bbox = right - left
                 h_bbox = bottom - top
                 x_anchor = left
@@ -175,6 +181,7 @@ if __name__ == '__main__':
                     idx_dict[idx]['no_frame'] += 1
                 else:
                      img = idx_dict[idx]['img']
+                     cv2.imshow(str(idx), img)
                      input_data = np.asarray(img, np.float32)
                      features = normalize(fd(np.expand_dims(input_data, axis=0))).flatten()
                      idx_reg_list.append(idx)
